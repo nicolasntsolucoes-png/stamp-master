@@ -23,6 +23,7 @@ export async function applyStamp(
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   const page = pdfDoc.getPages()[placement.pageIndex];
+  if (!page) throw new Error('Página não encontrada no PDF');
   const { width: pw, height: ph } = page.getSize();
   const rotation = ((page.getRotation().angle % 360) + 360) % 360;
 

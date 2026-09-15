@@ -120,10 +120,10 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
       x: dateX + 4,
       y: 14,
       size,
-      text: formatDate(values.data ?? ""),
+      text: formatDate(values['data'] ?? ""),
       bold: true,
     });
-    const tipo = values.tipo ?? "";
+    const tipo = values['tipo'] ?? "";
     let y = 36;
     checkbox(els, 14, y, size, "SPED FISCAL", tipo === "SPED FISCAL");
     y += 18;
@@ -143,7 +143,7 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
       x: dateX + 4,
       y: 44,
       size,
-      text: formatDate(values.vencimento ?? ""),
+      text: formatDate(values['vencimento'] ?? ""),
       bold: true,
     });
     return { width, height: 66, elements: els };
@@ -154,21 +154,21 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
   const width = 330;
   const lineEnd = width - 12;
   let y = 16;
-  labelledLine(els, 12, y, "LANÇAMENTO:", formatDate(values.data ?? ""), size, lineEnd);
+  labelledLine(els, 12, y, "LANÇAMENTO:", formatDate(values['data'] ?? ""), size, lineEnd);
   y += 17;
-  const pis = values.pisCofins ?? "";
+  const pis = values['pisCofins'] ?? "";
   els.push({ type: "text", x: 12, y, size, text: "APROVEITA PIS/COFINS", bold: true });
   let cx = 12 + textWidth("APROVEITA PIS/COFINS", size) + 8;
   cx += checkbox(els, cx, y, size, "SIM", pis === "SIM");
   checkbox(els, cx, y, size, "NÃO", pis === "NÃO");
   y += 17;
   const rows: [string, string][] = [
-    ["DEPARTAMENTO:", values.departamento ?? ""],
-    ["RATEIO:", values.rateio ?? ""],
-    ["PL. CONTAS:", values.plContas ?? ""],
-    ["FINALIDADE:", values.finalidade ?? ""],
-    ["CFOP:", values.cfop ?? ""],
-    ["ASS.:", values.assinatura ?? ""],
+    ["DEPARTAMENTO:", values['departamento'] ?? ""],
+    ["RATEIO:", values['rateio'] ?? ""],
+    ["PL. CONTAS:", values['plContas'] ?? ""],
+    ["FINALIDADE:", values['finalidade'] ?? ""],
+    ["CFOP:", values['cfop'] ?? ""],
+    ["ASS.:", values['assinatura'] ?? ""],
   ];
   for (const [label, value] of rows) {
     labelledLine(els, 12, y, label, value, size, lineEnd);
