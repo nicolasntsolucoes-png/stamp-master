@@ -160,6 +160,7 @@ export function PdfStage({
           {size.width > 0 && (
             <div
               role="button"
+              aria-label="Carimbo arrastável"
               tabIndex={0}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
