@@ -91,9 +91,10 @@ function labelledLine(
   value: string,
   size: number,
   lineEnd: number,
+  column: number,
 ) {
   els.push({ type: "text", x, y, size, text: label, bold: true });
-  const valueX = x + textWidth(label, size) + 4;
+  const valueX = Math.max(column, x + textWidth(label, size) + 6);
   els.push({ type: "line", x: valueX, y: y + size * 0.15, width: Math.max(lineEnd - valueX, 10) });
   if (value) {
     els.push({ type: "text", x: valueX + 2, y, size, text: value.toUpperCase(), bold: false });
@@ -113,7 +114,7 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
     const size = 12;
     const width = 240;
     els.push({ type: "text", x: 12, y: 14, size, text: "LANÇADO EM:", bold: true });
-    const dateX = 12 + textWidth("LANÇADO EM:", size) + 6;
+    const dateX = 100;
     els.push({ type: "line", x: dateX, y: 16, width: width - dateX - 12 });
     els.push({
       type: "text",
@@ -154,11 +155,12 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
   const width = 330;
   const lineEnd = width - 12;
   let y = 16;
-  labelledLine(els, 12, y, "LANÇAMENTO:", formatDate(values['data'] ?? ""), size, lineEnd);
+  const column = 112;
+  labelledLine(els, 12, y, "LANÇAMENTO:", formatDate(values['data'] ?? ""), size, lineEnd, column);
   y += 17;
   const pis = values['pisCofins'] ?? "";
   els.push({ type: "text", x: 12, y, size, text: "APROVEITA PIS/COFINS", bold: true });
-  let cx = 12 + textWidth("APROVEITA PIS/COFINS", size) + 8;
+  let cx = 12 + textWidth("APROVEITA PIS/COFINS", size) + 12;
   cx += checkbox(els, cx, y, size, "SIM", pis === "SIM");
   checkbox(els, cx, y, size, "NÃO", pis === "NÃO");
   y += 17;
@@ -171,7 +173,7 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
     ["ASS.:", values['assinatura'] ?? ""],
   ];
   for (const [label, value] of rows) {
-    labelledLine(els, 12, y, label, value, size, lineEnd);
+    labelledLine(els, 12, y, label, value, size, lineEnd, column);
     y += 17;
   }
   return { width, height: y + 2, elements: els };
