@@ -7,7 +7,7 @@ export function PdfDropzone({ onFile }: { onFile: (file: File) => void }) {
 
   const handle = (files: FileList | null) => {
     const file = files?.[0];
-    if (file && file.type === "application/pdf") onFile(file);
+    if (file && (file.type === "application/pdf" || /\.pdf$/i.test(file.name))) onFile(file);
   };
 
   return (
