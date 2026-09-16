@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Move, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, Move } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StampArtwork } from "@/components/StampArtwork";
 import type { StampArt } from "@/lib/stamps";
@@ -11,8 +11,6 @@ type Props = {
   art: StampArt;
   position: StagePosition;
   onPositionChange: (p: StagePosition) => void;
-  stampScale: number;
-  onStampScaleChange: (s: number) => void;
   onPreviewScale: (s: number) => void;
 };
 
@@ -21,8 +19,6 @@ export function PdfStage({
   art,
   position,
   onPositionChange,
-  stampScale,
-  onStampScaleChange,
   onPreviewScale,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -67,7 +63,8 @@ export function PdfStage({
     canvas.height = viewport.height * dpr;
     canvas.style.width = `${viewport.width}px`;
     canvas.style.height = `${viewport.height}px`;
-    const ctx = canvas.getContext("2d")!;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     await page.render({ canvasContext: ctx, viewport }).promise;
     setScale(s);
@@ -85,8 +82,8 @@ export function PdfStage({
     return () => window.removeEventListener("resize", onResize);
   }, [render]);
 
-  const stampW = art.width * scale * stampScale;
-  const stampH = art.height * scale * stampScale;
+  const stampW = art.width * scale;
+  const stampH = art.height * scale;
 
   const onPointerDown = (e: React.PointerEvent) => {
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -128,27 +125,6 @@ export function PdfStage({
             <ChevronRight className="size-4" />
           </Button>
         </div>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onStampScaleChange(Math.max(0.5, +(stampScale - 0.1).toFixed(2)))}
-            aria-label="Diminuir carimbo"
-          >
-            <ZoomOut className="size-4" />
-          </Button>
-          <span className="w-14 text-center text-sm text-muted-foreground">
-            {Math.round(stampScale * 100)}%
-          </span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => onStampScaleChange(Math.min(2, +(stampScale + 0.1).toFixed(2)))}
-            aria-label="Aumentar carimbo"
-          >
-            <ZoomIn className="size-4" />
-          </Button>
-        </div>
       </div>
 
       <div ref={wrapRef} className="overflow-auto rounded-lg border bg-muted/40 p-3">
@@ -170,7 +146,7 @@ export function PdfStage({
               style={{ left: position.x, top: position.y }}
             >
               <div className="opacity-90">
-                <StampArtwork art={art} scale={scale * stampScale} />
+                <StampArtwork art={art} scale={scale} />
               </div>
               <span className="pointer-events-none absolute -top-6 left-0 hidden items-center gap-1 rounded bg-foreground px-2 py-0.5 text-[11px] text-background group-hover:inline-flex">
                 <Move className="size-3" /> arraste para posicionar
