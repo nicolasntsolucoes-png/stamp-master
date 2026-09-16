@@ -99,15 +99,15 @@ function labelledLine(
   y: number,
   label: string,
   value: string,
-  size: number,
+  labelSize: number,
   lineEnd: number,
   column: number,
 ) {
-  els.push({ type: "text", x, y, size, text: label, bold: true });
-  const valueX = Math.max(column, x + textWidth(label, size) + 6);
-  els.push({ type: "line", x: valueX, y: y + size * 0.15, width: Math.max(lineEnd - valueX, 10) });
+  els.push({ type: "text", x, y, size: labelSize, text: label, bold: true });
+  const valueX = Math.max(column, x + textWidth(label, labelSize) + 6);
+  els.push({ type: "line", x: valueX, y: y + labelSize * 0.15, width: Math.max(lineEnd - valueX, 10) });
   if (value) {
-    els.push({ type: "text", x: valueX + 2, y, size, text: value.toUpperCase(), bold: false });
+    els.push({ type: "text", x: valueX + 2, y, size: INPUT_FONT_SIZE, text: value.toUpperCase(), bold: false });
   }
 }
 
@@ -121,7 +121,7 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
   const els: StampElement[] = [];
 
   if (kind === "lancamento") {
-    const width = mm(40);
+    const width = mm(50);
     const height = mm(20);
     const padding = 4.5;
     els.push({ type: "text", x: padding, y: 10, size: LABEL_FONT_SIZE, text: "LANÇADO EM:", bold: true });
@@ -142,7 +142,7 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
   }
 
   if (kind === "vencimento") {
-    const width = mm(50);
+    const width = mm(40);
     const height = mm(20);
     const padding = 5;
     els.push({ type: "text", x: padding, y: 11, size: INPUT_FONT_SIZE, text: "BOLETO", bold: true });
@@ -184,8 +184,6 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
   ];
   for (const [label, value] of rows) {
     labelledLine(els, 5, y, label, value, LABEL_FONT_SIZE, lineEnd, column);
-    const valueElement = els.at(-1);
-    if (valueElement?.type === "text") valueElement.size = INPUT_FONT_SIZE;
     y += 13;
   }
   return { width, height, elements: els };
