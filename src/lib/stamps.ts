@@ -25,6 +25,14 @@ export type StampDef = {
   }[];
 };
 
+const MM_TO_PT = 72 / 25.4;
+const INPUT_FONT_SIZE = 7.5;
+const LABEL_FONT_SIZE = 6.5;
+
+function mm(value: number): number {
+  return value * MM_TO_PT;
+}
+
 export const STAMP_DEFS: StampDef[] = [
   {
     kind: "lancamento",
@@ -67,7 +75,9 @@ export const STAMP_DEFS: StampDef[] = [
 ];
 
 export function getStampDef(kind: StampKind): StampDef {
-  return STAMP_DEFS.find((d) => d.kind === kind)!;
+  const definition = STAMP_DEFS.find((d) => d.kind === kind);
+  if (!definition) throw new Error("Modelo de carimbo não encontrado");
+  return definition;
 }
 
 export function formatDate(value: string): string {
@@ -77,7 +87,7 @@ export function formatDate(value: string): string {
   return `${d}/${m}/${y}`;
 }
 
-const CHAR_W = 0.58; // rough Helvetica-Bold advance ratio
+const CHAR_W = 0.54; // aproximação do avanço da Helvetica nesta escala
 
 export function textWidth(text: string, size: number): number {
   return text.length * size * CHAR_W;
@@ -111,59 +121,59 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
   const els: StampElement[] = [];
 
   if (kind === "lancamento") {
-    const size = 12;
-    const width = 240;
-    els.push({ type: "text", x: 12, y: 14, size, text: "LANÇADO EM:", bold: true });
-    const dateX = 100;
-    els.push({ type: "line", x: dateX, y: 16, width: width - dateX - 12 });
+    const width = mm(40);
+    const height = mm(20);
+    const padding = 4.5;
+    els.push({ type: "text", x: padding, y: 10, size: LABEL_FONT_SIZE, text: "LANÇADO EM:", bold: true });
+    const dateX = 49;
+    els.push({ type: "line", x: dateX, y: 11.5, width: width - dateX - padding });
     els.push({
       type: "text",
-      x: dateX + 4,
-      y: 14,
-      size,
+      x: dateX + 2,
+      y: 10,
+      size: INPUT_FONT_SIZE,
       text: formatDate(values['data'] ?? ""),
-      bold: true,
+      bold: false,
     });
     const tipo = values['tipo'] ?? "";
-    let y = 36;
-    checkbox(els, 14, y, size, "SPED FISCAL", tipo === "SPED FISCAL");
-    y += 18;
-    checkbox(els, 14, y, size, "CONTAS A PAGAR", tipo === "CONTAS A PAGAR");
-    return { width, height: y + 18, elements: els };
+    checkbox(els, padding, 29, INPUT_FONT_SIZE, "SPED FISCAL", tipo === "SPED FISCAL");
+    checkbox(els, padding, 45, INPUT_FONT_SIZE, "CONTAS A PAGAR", tipo === "CONTAS A PAGAR");
+    return { width, height, elements: els };
   }
 
   if (kind === "vencimento") {
-    const size = 14;
-    const width = 190;
-    els.push({ type: "text", x: 14, y: 16, size: 16, text: "BOLETO", bold: true });
-    els.push({ type: "text", x: 14, y: 44, size, text: "V.", bold: true });
-    const dateX = 14 + textWidth("V.", size) + 6;
-    els.push({ type: "line", x: dateX, y: 46, width: width - dateX - 14 });
+    const width = mm(50);
+    const height = mm(20);
+    const padding = 5;
+    els.push({ type: "text", x: padding, y: 11, size: INPUT_FONT_SIZE, text: "BOLETO", bold: true });
+    els.push({ type: "text", x: padding, y: 38, size: INPUT_FONT_SIZE, text: "V.", bold: true });
+    const dateX = 19;
+    els.push({ type: "line", x: dateX, y: 39.5, width: width - dateX - padding });
     els.push({
       type: "text",
-      x: dateX + 4,
-      y: 44,
-      size,
+      x: dateX + 2,
+      y: 38,
+      size: INPUT_FONT_SIZE,
       text: formatDate(values['vencimento'] ?? ""),
-      bold: true,
+      bold: false,
     });
-    return { width, height: 66, elements: els };
+    return { width, height, elements: els };
   }
 
   // classificação
-  const size = 11;
-  const width = 330;
-  const lineEnd = width - 12;
-  let y = 16;
-  const column = 112;
-  labelledLine(els, 12, y, "LANÇAMENTO:", formatDate(values['data'] ?? ""), size, lineEnd, column);
-  y += 17;
+  const width = mm(80);
+  const height = mm(40);
+  const lineEnd = width - 5;
+  const column = 78;
+  let y = 10;
+  labelledLine(els, 5, y, "LANÇAMENTO:", formatDate(values['data'] ?? ""), LABEL_FONT_SIZE, lineEnd, column);
+  y += 13;
   const pis = values['pisCofins'] ?? "";
-  els.push({ type: "text", x: 12, y, size, text: "APROVEITA PIS/COFINS", bold: true });
-  let cx = 12 + textWidth("APROVEITA PIS/COFINS", size) + 12;
-  cx += checkbox(els, cx, y, size, "SIM", pis === "SIM");
-  checkbox(els, cx, y, size, "NÃO", pis === "NÃO");
-  y += 17;
+  els.push({ type: "text", x: 5, y, size: LABEL_FONT_SIZE, text: "APROVEITA PIS/COFINS", bold: true });
+  let cx = 83;
+  cx += checkbox(els, cx, y, INPUT_FONT_SIZE, "SIM", pis === "SIM");
+  checkbox(els, cx, y, INPUT_FONT_SIZE, "NÃO", pis === "NÃO");
+  y += 13;
   const rows: [string, string][] = [
     ["DEPARTAMENTO:", values['departamento'] ?? ""],
     ["RATEIO:", values['rateio'] ?? ""],
@@ -173,8 +183,10 @@ export function buildStampArt(kind: StampKind, values: StampValues): StampArt {
     ["ASS.:", values['assinatura'] ?? ""],
   ];
   for (const [label, value] of rows) {
-    labelledLine(els, 12, y, label, value, size, lineEnd, column);
-    y += 17;
+    labelledLine(els, 5, y, label, value, LABEL_FONT_SIZE, lineEnd, column);
+    const valueElement = els.at(-1);
+    if (valueElement?.type === "text") valueElement.size = INPUT_FONT_SIZE;
+    y += 13;
   }
-  return { width, height: y + 2, elements: els };
+  return { width, height, elements: els };
 }

@@ -3,7 +3,7 @@ import type { StampArt } from "@/lib/stamps";
 export function StampArtwork({ art, scale = 1 }: { art: StampArt; scale?: number }) {
   return (
     <div
-      className="relative border-[1.5px] border-stamp-ink text-stamp-ink"
+      className="relative overflow-hidden border-[1.5px] border-stamp-ink text-stamp-ink"
       style={{ width: art.width * scale, height: art.height * scale }}
     >
       {art.elements.map((el, i) =>
@@ -17,7 +17,7 @@ export function StampArtwork({ art, scale = 1 }: { art: StampArt; scale?: number
               fontSize: el.size * scale,
               fontWeight: el.bold === false ? 500 : 700,
               fontFamily: "var(--font-stamp)",
-              letterSpacing: "0.02em",
+              letterSpacing: 0,
             }}
           >
             {el.text}

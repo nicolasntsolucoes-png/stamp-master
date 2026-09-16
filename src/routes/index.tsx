@@ -23,6 +23,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Carimbe notas fiscais e boletos em PDF e baixe o documento pronto.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,
@@ -56,7 +58,6 @@ function Index() {
   const [kind, setKind] = useState<StampKind | null>(null);
   const [values, setValues] = useState<StampValues>({});
   const [position, setPosition] = useState<StagePosition>({ pageIndex: 0, x: 40, y: 40 });
-  const [stampScale, setStampScale] = useState(1);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const previewScaleRef = useRef(1);
@@ -83,7 +84,6 @@ function Index() {
         x: position.x,
         y: position.y,
         previewScale: previewScaleRef.current,
-        stampScale,
       });
       const blob = new Blob([out as unknown as BlobPart], { type: "application/pdf" });
       setResultUrl(URL.createObjectURL(blob));
@@ -98,7 +98,6 @@ function Index() {
     setKind(null);
     setValues({});
     setResultUrl(null);
-    setStampScale(1);
   };
 
   const outName = file ? file.name.replace(/\.pdf$/i, "") + "-carimbado.pdf" : "documento-carimbado.pdf";
@@ -155,8 +154,6 @@ function Index() {
                 setPosition(p);
                 setResultUrl(null);
               }}
-              stampScale={stampScale}
-              onStampScaleChange={setStampScale}
               onPreviewScale={onPreviewScale}
             />
             <div className="mt-4 flex flex-wrap items-center gap-2">

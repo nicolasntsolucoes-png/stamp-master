@@ -8,8 +8,6 @@ export type StampPlacement = {
   y: number;
   /** preview pixels per PDF point */
   previewScale: number;
-  /** extra stamp scale chosen by the user */
-  stampScale: number;
 };
 
 const INK = rgb(0.09, 0.11, 0.18);
@@ -27,7 +25,7 @@ export async function applyStamp(
   const { width: pw, height: ph } = page.getSize();
   const rotation = ((page.getRotation().angle % 360) + 360) % 360;
 
-  const s = placement.stampScale;
+  const s = 1;
   // top-left of the stamp in unrotated "view" coordinates (points, origin top-left)
   const vx = placement.x / placement.previewScale;
   const vy = placement.y / placement.previewScale;
